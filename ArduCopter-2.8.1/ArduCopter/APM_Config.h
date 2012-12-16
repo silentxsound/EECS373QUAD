@@ -2,7 +2,7 @@
 
 // Example config file. Take a look at config.h. Any term define there can be overridden by defining it here.
 
-//#define CONFIG_APM_HARDWARE APM_HARDWARE_APM2
+#define CONFIG_APM_HARDWARE APM_HARDWARE_APM1 //was ap2
 
 // Ordinary users should please ignore the following define.
 // APM2_BETA_HARDWARE is used to support early (September-October 2011) APM2
@@ -12,6 +12,8 @@
 
 // GPS is auto-selected
 
+//#define INSTANT_PWM ENABLED
+//#define SERIAL_SUM
 //#define MAG_ORIENTATION		AP_COMPASS_COMPONENTS_DOWN_PINS_FORWARD
 //#define HIL_MODE				HIL_MODE_ATTITUDE
 //#define DMP_ENABLED ENABLED
@@ -85,21 +87,24 @@
 // the choice of function names is up to the user and does not have to match these
 // uncomment these hooks and ensure there is a matching function on your "UserCode.pde" file
 //#define USERHOOK_FASTLOOP userhook_FastLoop();
-#define USERHOOK_50HZLOOP userhook_50Hz();
+// #define USERHOOK_50HZLOOP userhook_50Hz();
 //#define USERHOOK_MEDIUMLOOP userhook_MediumLoop();
 //#define USERHOOK_SLOWLOOP userhook_SlowLoop();
 //#define USERHOOK_SUPERSLOWLOOP userhook_SuperSlowLoop();
-#define USERHOOK_INIT userhook_init();
+// #define USERHOOK_INIT userhook_init();
 
 // the choice of included variables file (*.h) is up to the user and does not have to match this one
 // Ensure the defined file exists and is in the arducopter directory
-#define USERHOOK_VARIABLES "UserVariables.h"
+// #define USERHOOK_VARIABLES "UserVariables.h"
 
 // to enable, set to 1
 // to disable, set to 0
 // #define AUTO_THROTTLE_HOLD 1
 
-//#define LOGGING_ENABLED		DISABLED
+//#define LOGGING_ENABLED		ENABLED //was commented out
+
+
+
 
 
 // Custom channel config - Expert Use Only.

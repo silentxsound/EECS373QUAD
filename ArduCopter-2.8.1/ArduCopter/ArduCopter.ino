@@ -1,6 +1,6 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 
-#define THISFIRMWARE "ArduCopter V2.8.1"
+#define THISFIRMWARE "ArduCopter V2.8.1CUSTOM"
 /*
  *  ArduCopter Version 2.8
  *  Lead author:	Jason Short
@@ -134,11 +134,11 @@
 // Note that FastSerial port buffers are allocated at ::begin time,
 // so there is not much of a penalty to defining ports that we don't
 // use.
-// 
+//
 FastSerialPort0(Serial);        // FTDI/console
 FastSerialPort1(Serial1);       // GPS port
 FastSerialPort3(Serial3);       // Telemetry port
-// 
+
 // this sets up the parameter table, and sets the default values. This
 // must be the first AP_Param variable declared to ensure its
 // constructor runs before the constructors of the other AP_Param
@@ -209,6 +209,7 @@ AP_ADC_ADS7844 adc;
 
  #ifdef DESKTOP_BUILD
 AP_Baro_BMP085_HIL barometer;
+#error "Baro: BMP805 HIL"
 AP_Compass_HIL compass;
   #include <SITL.h>
 SITL sitl;
@@ -217,8 +218,10 @@ SITL sitl;
   #if CONFIG_BARO == AP_BARO_BMP085
    # if CONFIG_APM_HARDWARE == APM_HARDWARE_APM2
 AP_Baro_BMP085 barometer(true);
+#error "Baro: BMP805 APM0"
    # else
 AP_Baro_BMP085 barometer(false);
+#error "Baro: BMP805 APM1"
    # endif
   #elif CONFIG_BARO == AP_BARO_MS5611
 AP_Baro_MS5611 barometer;
@@ -263,13 +266,12 @@ AP_GPS_None     g_gps_driver(NULL);
   #error Unrecognised GPS_PROTOCOL setting.
  #endif // GPS PROTOCOL
 
- #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
-AP_InertialSensor_MPU6000 ins;
- #elif CONFIG_IMU_TYPE == CONFIG_IMU_OILPAN // ??
-AP_InertialSensor_Oilpan ins(&adc);
- #else
-AP_InertialSensor_MinIMU9 ins(); // does something needs to go in function call, but what??
- #endif
+//  #if CONFIG_IMU_TYPE == CONFIG_IMU_MPU6000
+// AP_InertialSensor_MPU6000 ins;
+//  #else
+// AP_InertialSensor_Oilpan ins(&adc);
+//  #endif
+AP_InertialSensor_MinIMU9 ins;
 AP_IMU_INS  imu(&ins);
 
 // we don't want to use gps for yaw correction on ArduCopter, so pass
@@ -2079,8 +2081,7 @@ static void read_AHRS(void)
 #endif
 }
 
-static void update_trig(void)
-{
+static void update_trig(void){
     Vector2f yawvector;
     Matrix3f temp   = ahrs.get_dcm_matrix();
 

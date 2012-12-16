@@ -40,7 +40,7 @@
 #define Gyro_Y_sign 1
 #define Gyro_Z_sign 1
 
-#define Accel_X_sign 1
+#define Accel_X_sign -1
 #define Accel_Y_sign 1
 #define Accel_Z_sign 1
 
@@ -58,10 +58,10 @@ AP_InertialSensor_MinIMU9::AP_InertialSensor_MinIMU9() // : AP_InertialSensor
 
 uint16_t AP_InertialSensor_MinIMU9::init(AP_PeriodicProcess * scheduler)
 {
-    _deviceGyro = L3GD20_DEVICE,
+    _deviceGyro = L3GD20_DEVICE;
     _gyro_address = L3GD20_ADDRESS_SA0_HIGH;
     _deviceAccel = LSM303DLHC_DEVICE;
-    _accel_address = L3G4200D_ADDRESS_SA0_HIGH;
+    _accel_address = ACC_ADDRESS_SA0_A_HIGH;
     enableDefault();
     return AP_PRODUCT_ID_NONE; // ?? should this change
 }
@@ -69,13 +69,25 @@ uint16_t AP_InertialSensor_MinIMU9::init(AP_PeriodicProcess * scheduler)
 bool AP_InertialSensor_MinIMU9::update( void )
 {
   read();
-  _gyro.x = Gyro_Gain_X * Gyro_X_sign * _gyro.x;
-  _gyro.y = Gyro_Gain_Y * Gyro_X_sign * _gyro.y;
-  _gyro.z = Gyro_Gain_Z * Gyro_X_sign * _gyro.z;
 
-  _accel.x = Accel_Scale_X * Accel_X_sign * _accel.x;
-  _accel.y = Accel_Scale_Y * Accel_X_sign * _accel.y;
-  _accel.z = Accel_Scale_Z * Accel_X_sign * _accel.z;
+  // with gain & scale
+  // _gyro.x = Gyro_Gain_X * Gyro_X_sign * _gyro.x;
+  // _gyro.y = Gyro_Gain_Y * Gyro_X_sign * _gyro.y;
+  // _gyro.z = Gyro_Gain_Z * Gyro_X_sign * _gyro.z;
+
+  // _accel.x = Accel_Scale_X * Accel_X_sign * _accel.x;
+  // _accel.y = Accel_Scale_Y * Accel_X_sign * _accel.y;
+  // _accel.z = Accel_Scale_Z * Accel_X_sign * _accel.z;
+
+  // without gain & scale
+  _gyro.x = Gyro_X_sign * _gyro.x;
+  _gyro.y = Gyro_X_sign * _gyro.y;
+  _gyro.z = Gyro_X_sign * _gyro.z;
+
+  _accel.x = Accel_X_sign * _accel.x;
+  _accel.y = Accel_X_sign * _accel.y;
+  _accel.z = Accel_X_sign * _accel.z;
+
 }
 
 bool AP_InertialSensor_MinIMU9::new_data_available( void )
@@ -136,7 +148,7 @@ void AP_InertialSensor_MinIMU9::get_sensors( float * sensors )
 float AP_InertialSensor_MinIMU9::temperature()
 {
     uint8_t buff[2];
-    I2c.read(MAG_ADDRESS, LSM303_TEMP_OUT_H_M, 2, buff);
+    I2c.read(MAG_ADDRESS, LSM303_TEMP_OUT_H_M | (1 << 7), 2, buff);
     _temp = ((int16_t)(buff[0] << 8 | buff[1])) >> 4;
     return _temp;
 }
@@ -170,7 +182,7 @@ void AP_InertialSensor_MinIMU9::read(void)
 // Reads a gyro register
 bool AP_InertialSensor_MinIMU9::readGyroReg(int reg, byte *value)
 {
-  if (I2c.read((uint8_t)_gyro_address, reg, 1, value) != 0) {
+  if (I2c.read((uint8_t)_gyro_address, reg | (1 << 7), 1, value) != 0) {
         // healthy = false;
         return false;
   }
@@ -189,11 +201,12 @@ bool AP_InertialSensor_MinIMU9::writeGyroReg(byte reg, byte value)
 
 bool AP_InertialSensor_MinIMU9::readGyro()
 {
+  // Serial.print("Doing readGyro(): start\n");
   uint8_t buff[6];
 
   // assert the MSB of the address to get the gyro
   // to do slave-transmit subaddress updating.
-  if (I2c.read(MAG_ADDRESS, L3G_OUT_X_L | (1 << 7), 6, buff) != 0) {
+  if (I2c.read(_gyro_address, L3G_OUT_X_L | (1 << 7), 6, buff) != 0) {
       // healthy = false;
       return false;
   }
@@ -202,12 +215,21 @@ bool AP_InertialSensor_MinIMU9::readGyro()
   _gyro.x = (int16_t)(buff[1] << 8 | buff[0]);
   _gyro.y = (int16_t)(buff[3] << 8 | buff[2]);
   _gyro.z = (int16_t)(buff[5] << 8 | buff[4]);
+  // Serial.print("G ");
+  // Serial.print("X: ");
+  // Serial.print((int)_gyro.x);
+  // Serial.print(" Y: ");
+  // Serial.print((int)_gyro.y);
+  // Serial.print(" Z: ");
+  // Serial.println((int)_gyro.z);
+  // delay(50);
+  // Serial.print("Doing readGyro(): complete\n");
 }
 
 // Reads an accelerometer register
 bool AP_InertialSensor_MinIMU9::readAccelReg(int reg, byte *value)
 {
-  if (I2c.read((uint8_t)_accel_address, reg, 1, value) != 0) {
+  if (I2c.read((uint8_t)_accel_address, reg | (1 << 7), 1, value) != 0) {
         // healthy = false;
         return false;
   }
@@ -227,6 +249,7 @@ bool AP_InertialSensor_MinIMU9::writeAccelReg(byte reg, byte value)
 // Reads the 3 accelerometer channels and stores them in vector a
 bool AP_InertialSensor_MinIMU9::readAccel(void)
 {
+  // Serial.print("Doing readAccel(): start\n");
   uint8_t buff[6];
   // assert the MSB of the address to get the accelerometer 
   // to do slave-transmit subaddress updating.
@@ -234,13 +257,27 @@ bool AP_InertialSensor_MinIMU9::readAccel(void)
       // healthy = false;
       return false;
   }
-
   // combine high and low bytes, then shift right to discard lowest 4 bits (which are meaningless)
   // GCC performs an arithmetic right shift for signed negative numbers, but this code will not work
   // if you port it to a compiler that does a logical right shift instead.
   _accel.x = ((int16_t)(buff[1] << 8 | buff[0])) >> 4;
   _accel.y = ((int16_t)(buff[3] << 8 | buff[2])) >> 4;
   _accel.z = ((int16_t)(buff[5] << 8 | buff[4])) >> 4;
+
+  // without shift
+  // _accel.x = (int16_t)(buff[1] << 8 | buff[0]);
+  // _accel.y = (int16_t)(buff[3] << 8 | buff[2]);
+  // _accel.z = (int16_t)(buff[5] << 8 | buff[4]);
+  
+  // Serial.print("A ");
+  // Serial.print("X: ");
+  // Serial.print((int)_accel.x);
+  // Serial.print(" Y: ");
+  // Serial.print((int)_accel.y);
+  // Serial.print(" Z: ");
+  // Serial.println((int)_accel.z);
+  // delay(50);
+  // Serial.print("Doing readAccel(): complete\n");
 }
 
 // Turns on the L3G's gyro and places it in normal mode.
@@ -254,13 +291,13 @@ void AP_InertialSensor_MinIMU9::enableDefault(void)
     // 0x67 = 200Hz
     // 0x77 = 400Hz
     // Normal power mode, all axes enabled
-    Serial.print("Doing writeAccelReg(): start\n");
-    writeAccelReg(LSM303_CTRL_REG1_A, 0x67); // 200Hz = MPU6000 sample rate, is this too fast?
-    Serial.print("Doing writeAccelReg(): complete\n");
+    // Serial.print("Doing writeAccelReg(): start\n");
+    writeAccelReg(LSM303_CTRL_REG1_A, 0x67);
+    // Serial.print("Doing writeAccelReg(): complete\n");
     // Enable Gyroscope
     // 0x0F = 0b00001111
     // Normal power mode, all axes enabled
-    Serial.print("Doing writeGyroReg(): start\n");
+    // Serial.print("Doing writeGyroReg(): start\n");
     writeGyroReg(L3G_CTRL_REG1, 0x0F); // 0x0F may need to change
-    Serial.print("Doing writeGyroReg(): complete\n");
+    // Serial.print("Doing writeGyroReg(): complete\n");
 }

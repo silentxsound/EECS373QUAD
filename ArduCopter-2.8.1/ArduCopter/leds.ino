@@ -88,7 +88,6 @@ static void dancing_light()
         break;
     }
 }
-
 static void clear_leds()
 {
     digitalWrite(A_LED_PIN, LED_OFF);

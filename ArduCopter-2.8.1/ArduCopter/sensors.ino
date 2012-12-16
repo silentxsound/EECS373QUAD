@@ -105,9 +105,9 @@ static void read_battery(void)
         }
 
 
+ #endif                // COPTER_LEDS
     }else if ( bitRead(g.copter_leds_mode, 3) ) {
         piezo_off();
- #endif                // COPTER_LEDS
     }
 #endif         //BATTERY_EVENT
 }

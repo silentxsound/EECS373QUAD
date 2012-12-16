@@ -135,6 +135,14 @@ public:
     uint16_t        num_samples_available();
     void            read();
 
+    static const struct AP_Param::GroupInfo        var_info[];
+
+    AP_Int16                    _x_high;
+    AP_Int16                    _x_low;
+    AP_Int16                    _y_high;
+    AP_Int16                    _y_low;
+    AP_Int16                    _z_high;
+    AP_Int16                    _z_low;
 
 private:
     byte _deviceGyro; // chip type (4200D or D20)

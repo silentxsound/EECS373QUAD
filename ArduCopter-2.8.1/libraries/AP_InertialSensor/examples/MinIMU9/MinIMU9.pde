@@ -22,6 +22,7 @@ AP_InertialSensor_MinIMU9 ins;
 void setup(void)
 {
     Serial.begin(115200);
+    // Serial.begin(9600);
     Serial.println("INS library test: MinIMU9");
     I2c.begin();
     I2c.timeOut(20);
@@ -38,7 +39,7 @@ void loop(void)
     float gyro[3];
     float temperature;
 
-    delay(20);
+    delay(100);
     ins.update();
     ins.get_gyros(gyro);
     ins.get_accels(accel);

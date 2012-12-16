@@ -36,10 +36,14 @@ void loop()
     if (APM_RC.GetState() == 1) {
         Serial.print("CH:");
         for(int i = 0; i < 8; i++) {
-            Serial.print(APM_RC.InputCh(i));                    // Print channel values
+            Serial.print(APM_RC.InputCh(CH_3));                    // Print channel values
             Serial.print(",");
-            APM_RC.OutputCh(i, APM_RC.InputCh(i));             // Copy input to Servos
+            // APM_RC.OutputCh(i, APM_RC.InputCh(CH_3));             // Copy input to Servos
         }
+        APM_RC.OutputCh(CH_1, APM_RC.InputCh(CH_3));
+        APM_RC.OutputCh(CH_2, APM_RC.InputCh(CH_3));
+        APM_RC.OutputCh(CH_3, APM_RC.InputCh(CH_3));
+        APM_RC.OutputCh(CH_4, APM_RC.InputCh(CH_3));
         Serial.println();
     }
 }

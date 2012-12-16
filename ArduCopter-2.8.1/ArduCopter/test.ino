@@ -841,8 +841,8 @@ test_gps(uint8_t argc, const Menu::arg *argv)
  *                       return (0);
  *               }
  *       }
- *  }*/
-
+ *  }
+ */
 /*
  *  //static int8_t
  *  //test_dcm(uint8_t argc, const Menu::arg *argv)
@@ -903,7 +903,7 @@ test_gps(uint8_t argc, const Menu::arg *argv)
  *       }
  *       return (0);
  *  }
- */
+ *  //*/
 
 static int8_t
 test_tuning(uint8_t argc, const Menu::arg *argv)
@@ -968,8 +968,7 @@ test_battery(uint8_t argc, const Menu::arg *argv)
 #endif
 }
 
-static int8_t 
-test_relay(uint8_t argc, const Menu::arg *argv)
+static int8_t test_relay(uint8_t argc, const Menu::arg *argv)
 {
 #if defined( __AVR_ATmega1280__ )          // test disabled to save code size for 1280
     print_test_disabled();
@@ -1037,10 +1036,10 @@ test_wp(uint8_t argc, const Menu::arg *argv)
  *          }
  *          if(Serial.available() > 0){
  *                          return (0);
- *          }
- *      }
-    }
+ *  }
+ *  }
  */
+//}
 
 /*static int8_t
  *  //test_xbee(uint8_t argc, const Menu::arg *argv)

@@ -135,7 +135,7 @@ void L3G::vector_normalize(vector *a)
 bool L3G::autoDetectAddress(void)
 {
   // try each possible address and stop if reading WHO_AM_I returns the expected response
-  address = L3G4200D_ADDRESS_SA0_LOW;
+  address =  L3G4200D_ADDRESS_SA0_LOW;
   if (readReg(L3G_WHO_AM_I) == 0xD3) return true;
   address = L3G4200D_ADDRESS_SA0_HIGH;
   if (readReg(L3G_WHO_AM_I) == 0xD3) return true;
